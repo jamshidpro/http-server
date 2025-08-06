@@ -16,11 +16,15 @@ public class Request {
 
     public Request(byte[] requestBytes, int len) {
         String requestStr = new String(requestBytes, 0, len);
+        String[] parts = requestStr.split("\\r\\n\\r\\n" ,2);
+        String header = parts[0];
+        String body = parts.length > 1 ? parts[1] : null;
         String[] split = requestStr.split("\r\n");
 
         this.parseMethodAndPathAndVersion(split[0]);
         this.parseHeaders(split);
-
+//        System.out.println(body + "<-body" + header + "<-header");
+        this.body = body;
         System.out.println(this);
     }
 
@@ -29,7 +33,7 @@ public class Request {
 
         int i = 1;
         while (i < headers.length && !headers[i].isEmpty()){
-            String[] keyAndVal = headers[i].split(":");
+            String[] keyAndVal = headers[i].split(":", 2);
 
             System.out.println(Arrays.toString(keyAndVal));
 
@@ -56,6 +60,7 @@ public class Request {
     }
 
     private void parseMethodAndPathAndVersion(String line) {
+        System.out.println("Raw header line: " + line);
         String[] split = line.split(" ");
 
         if (split.length != 3){
